@@ -33,6 +33,8 @@ namespace duckx {
         void set_current(pugi::xml_node);
 
         std::string get_text() const;
+        std::string get_text_citation() const;
+
         bool set_text(const std::string&) const;
         bool set_text(const char *) const;
 

@@ -21,8 +21,16 @@ duckx::Run::Run(pugi::xml_node parent, pugi::xml_node current) {
 }
 
 void duckx::Run::set_parent(pugi::xml_node node) {
-    this->parent = node;
-    this->current = this->parent.child("w:r");
+	this->parent = node;
+	//this->current = this->parent.child("w:r");
+
+	// Accept both <w:r> and <w:sdt> as runs
+	this->current = this->parent.first_child();
+	while (this->current &&
+		std::string(this->current.name()) != "w:r" &&
+		std::string(this->current.name()) != "w:sdt") {
+		this->current = this->current.next_sibling();
+	}
 }
 
 void duckx::Run::set_current(pugi::xml_node node) {
@@ -32,6 +40,31 @@ void duckx::Run::set_current(pugi::xml_node node) {
 
 std::string duckx::Run::get_text() const {
     return this->current.child("w:t").text().get();
+}
+
+std::string duckx::Run::get_text_citation() const {
+	std::string result;
+
+	for (auto t = this->current.child("w:t"); t; t = t.next_sibling("w:t")) {
+		result += t.text().get();
+	}
+
+	// Text inside <w:sdtContent> (Mendeley citations)
+	auto sdtContent = this->current.child("w:sdtContent");
+	if (sdtContent) {
+		for (auto r = sdtContent.child("w:r"); r; r = r.next_sibling("w:r")) {
+			for (auto t = r.child("w:t"); t; t = t.next_sibling("w:t")) {
+				result += t.text().get();
+			}
+		}
+	}
+
+	// Field instruction text (Mendeley)
+	for (auto instr = this->current.child("w:instrText"); instr; instr = instr.next_sibling("w:instrText")) {
+		result += instr.text().get();
+	}
+
+	return result;
 }
 
 bool duckx::Run::set_text(const std::string& text) const {
@@ -76,8 +109,17 @@ bool duckx::TableCell::has_next() const {
 	return this->current != 0;
 }
 
-duckx::TableCell& duckx::TableCell::next() {
-	this->current = this->current.next_sibling();
+duckx::Run& duckx::Run::next() {
+	//this->current = this->current.next_sibling();
+	//return *this;
+
+	do {
+		this->current = this->current.next_sibling();
+	} while (this->current &&
+		std::string(this->current.name()) != "w:r" &&
+		std::string(this->current.name()) != "w:sdt");
+
+
 	return *this;
 }
 
