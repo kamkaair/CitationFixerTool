@@ -37,6 +37,7 @@ namespace duckx {
 
         bool set_text(const std::string&) const;
         bool set_text(const char *) const;
+        bool set_citation(const char*) const;
 
         Run &next();
         bool has_next() const;

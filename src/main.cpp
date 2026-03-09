@@ -12,8 +12,8 @@ int get_letters(std::string par, std::string &container, int index) {
     return get_letters(par, container, index-1);
 }
 
-void read_paragraph(std::string par, int indices[]) {
-    std::string container;
+void read_paragraph(std::string par, int indices[], std::string &container) {
+    
     bool whileLoop = true;
     
     if (par.find(']') == std::string::npos)
@@ -31,7 +31,7 @@ void read_paragraph(std::string par, int indices[]) {
 
             indices[1] = get_letters(par, container, indices[1]-1);     // Go through all the letters from ']' onwards
             reverse(container.begin(), container.end());                // Reverse the string, because it was iterated backwards
-            container += '.';                                           // Add the dot
+            //container += '.';                                           // Add the dot
 
             std::cout << "Check this shit out: " << container << " Index: " << indices[0] << " " << indices[1] << std::endl;
             whileLoop = false;
@@ -55,26 +55,32 @@ int main() {
 
     duckx::Document doc(ASSET_DIR + std::string("/my_test.docx"));
     doc.open();
-    std::string textCache;
     int indices[2] = { 0,0 };   // Begin, end
    
     for (auto p = doc.paragraphs(); p.has_next(); p.next()) {
-        std::string paragraph;
+        std::string paragraph, container;
         for (auto r = p.runs(); r.has_next(); r.next()) {
             paragraph += r.getAll_text();
-            std::cout << r.getAll_text() << std::endl;
+            //std::cout << r.getAll_text() << std::endl;
             //r.set_citation("aaa");
         }   
         
-        read_paragraph(paragraph, indices);
+        read_paragraph(paragraph, indices, container);
         
-        
+        for (auto r = p.runs(); r.has_next(); r.next()) {
+            if (r.getAll_text().find(container) != std::string::npos && container != "") {
+                std::cout << r.getAll_text() << std::endl;
+                //r.set_citation('[' + container.c_str() + '.' + ']');
+                
+                //std::cout << '[' + container.c_str() + '.' + ']' << std::endl;
+            }
+        }
 
         paragraph += "\n\n";
         //std::cout << paragraph << std::endl;
     }
 
-    doc.save();
+    //doc.save();
 
     //cout << textCache << endl;
     return 0;

@@ -75,6 +75,27 @@ bool duckx::Run::set_text(const char *text) const {
     return this->current.child("w:t").text().set(text);
 }
 
+bool duckx::Run::set_citation(const char* text) const {
+	const char* result = "";
+
+	// Text inside <w:sdtContent> (Mendeley citations)
+	auto sdtContent = this->current.child("w:sdtContent");
+	if (sdtContent) {
+		for (auto r = sdtContent.child("w:r"); r; r = r.next_sibling("w:r")) {
+			for (auto t = r.child("w:t"); t; t = t.next_sibling("w:t")) {
+				result += t.text().set(text);
+			}
+		}
+	}
+
+	// Field instruction text (Mendeley)
+	for (auto instr = this->current.child("w:instrText"); instr; instr = instr.next_sibling("w:instrText")) {
+		result += instr.text().set(text);
+	}
+
+	return result;
+}
+
 duckx::Run& duckx::Run::next() {
     this->current = this->current.next_sibling();
     return *this;
