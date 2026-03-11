@@ -33,13 +33,12 @@ namespace duckx {
         void set_current(pugi::xml_node);
 
         std::string get_text() const;
-        std::string get_text_citation() const;
-
+        std::string getAll_text() const;
         bool set_text(const std::string&) const;
-        bool set_text(const char *) const;
+        bool set_text(const char*) const;
         bool set_citation(const char*) const;
 
-        Run &next();
+        Run& next();
         bool has_next() const;
     };
 
@@ -60,71 +59,71 @@ namespace duckx {
         void set_parent(pugi::xml_node);
         void set_current(pugi::xml_node);
 
-        Paragraph &next();
+        Paragraph& next();
         bool has_next() const;
 
-        Run &runs();
-        Run &add_run(const std::string&);
-        Run &add_run(const char*);
-        Paragraph &insert_paragraph_after(const std::string&);
+        Run& runs();
+        Run& add_run(const std::string&);
+        Run& add_run(const char*);
+        Paragraph& insert_paragraph_after(const std::string&);
     };
 
-	// TableCell contains one or more paragraphs
-	class TableCell {
-	private:
-		pugi::xml_node parent;
-		pugi::xml_node current;
+    // TableCell contains one or more paragraphs
+    class TableCell {
+    private:
+        pugi::xml_node parent;
+        pugi::xml_node current;
 
-		Paragraph paragraph;
-	public:
-		TableCell();
-		TableCell(pugi::xml_node, pugi::xml_node);
+        Paragraph paragraph;
+    public:
+        TableCell();
+        TableCell(pugi::xml_node, pugi::xml_node);
 
-		void set_parent(pugi::xml_node);
-		void set_current(pugi::xml_node);
+        void set_parent(pugi::xml_node);
+        void set_current(pugi::xml_node);
 
-		Paragraph& paragraphs();
+        Paragraph& paragraphs();
 
-		TableCell& next();
-		bool has_next() const;
-	};
+        TableCell& next();
+        bool has_next() const;
+    };
 
-	// TableRow consists of one or more TableCells
-	class TableRow {
-		pugi::xml_node parent;
-		pugi::xml_node current;
+    // TableRow consists of one or more TableCells
+    class TableRow {
+        pugi::xml_node parent;
+        pugi::xml_node current;
 
-		TableCell cell;
-	public:
-		TableRow();
-		TableRow(pugi::xml_node, pugi::xml_node);
-		void set_parent(pugi::xml_node);
-		void set_current(pugi::xml_node);
+        TableCell cell;
+    public:
+        TableRow();
+        TableRow(pugi::xml_node, pugi::xml_node);
+        void set_parent(pugi::xml_node);
+        void set_current(pugi::xml_node);
 
-		TableCell& cells();
+        TableCell& cells();
 
-		bool has_next() const;
-		TableRow& next();
-	};
+        bool has_next() const;
+        TableRow& next();
+    };
 
-	// Table consists of one or more TableRow objects
-	class Table {
-	private:
-		pugi::xml_node parent;
-		pugi::xml_node current;
+    // Table consists of one or more TableRow objects
+    class Table {
+    private:
+        pugi::xml_node parent;
+        pugi::xml_node current;
 
-		TableRow row;
-	public:
-		Table();
-		Table(pugi::xml_node, pugi::xml_node);
-		void set_parent(pugi::xml_node);
-		void set_current(pugi::xml_node);
+        TableRow row;
+    public:
+        Table();
+        Table(pugi::xml_node, pugi::xml_node);
+        void set_parent(pugi::xml_node);
+        void set_current(pugi::xml_node);
 
-		Table& next();
-		bool has_next() const;
+        Table& next();
+        bool has_next() const;
 
-		TableRow& rows();
-	};
+        TableRow& rows();
+    };
 
     // Document contains whole the docx file
     // and stores paragraphs
@@ -132,7 +131,7 @@ namespace duckx {
     private:
         std::string directory;
         Paragraph paragraph;
-		Table table;
+        Table table;
         pugi::xml_document document;
 
     public:
@@ -142,8 +141,8 @@ namespace duckx {
         void open();
         void save() const;
 
-        Paragraph &paragraphs();
-		Table& tables();
+        Paragraph& paragraphs();
+        Table& tables();
     };
 }
 

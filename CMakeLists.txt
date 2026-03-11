@@ -19,11 +19,11 @@ add_compile_definitions(ASSET_DIR="${ASSET_DIR}")
 # ----------------------------
 #${CMAKE_SOURCE_DIR}
 add_library(pugixml STATIC
-    F:/Koulu/Opari/CitationFixer/DuckX/ext/pugixml-1.9/src/pugixml.cpp
+    ${CMAKE_SOURCE_DIR}/ext/pugixml-1.9/src/pugixml.cpp
 )
 
 target_include_directories(pugixml PUBLIC
-    F:/Koulu/Opari/CitationFixer/DuckX/ext/pugixml-1.9/src
+    ${CMAKE_SOURCE_DIR}/ext/pugixml-1.9/src
 )
 
 #add_subdirectory(DuckX/ext/pugixml-1.15)
@@ -32,27 +32,26 @@ target_include_directories(pugixml PUBLIC
 # Add zip library
 # ----------------------------
 add_library(zip STATIC
-    F:/Koulu/Opari/CitationFixer/DuckX/ext/zip-0.1.15/src/zip.c
+    ${CMAKE_SOURCE_DIR}/ext/zip-0.1.15/src/zip.c
 )
 
 target_include_directories(zip PUBLIC
-    F:/Koulu/Opari/CitationFixer/DuckX/ext/zip-0.1.15/src
+    ${CMAKE_SOURCE_DIR}/ext/zip-0.1.15/src
 )
 
 # ----------------------------
 # Add DuckX
 # ----------------------------
 file(GLOB DUCKX_SRC
-	F:/Koulu/Opari/CitationFixer/DuckX/ext/DuckX-1.2.2/src/*.cpp
-    #F:/Koulu/Opari/CitationFixer/DuckX/src/*.cpp
+	${CMAKE_SOURCE_DIR}/ext/DuckX-1.2.2/src/*.cpp
 )
 
 add_library(duckx STATIC ${DUCKX_SRC})
 
 target_include_directories(duckx PUBLIC
-    F:/Koulu/Opari/CitationFixer/DuckX/ext/DuckX-1.2.2/src
-    F:/Koulu/Opari/CitationFixer/DuckX/ext/pugixml-1.9/src
-    F:/Koulu/Opari/CitationFixer/DuckX/ext/zip-0.1.15/src
+	${CMAKE_SOURCE_DIR}/ext/DuckX-1.2.2/src
+    ${CMAKE_SOURCE_DIR}/ext/pugixml-1.9/src
+    ${CMAKE_SOURCE_DIR}/ext/zip-0.1.15/src
 )
 
 target_link_libraries(duckx

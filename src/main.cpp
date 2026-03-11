@@ -21,10 +21,6 @@ void read_paragraph(std::string par, int indices[], std::string &container) {
 
     for (int i = par.size(); whileLoop; i--) {
         if (par[i] == ']') {
-            /*for (auto& index : indices) {
-                index = i;
-            }*/
-
             for (int j = 0; j < 2; j++) {
                 indices[j] = i;
             }
@@ -53,19 +49,24 @@ int main() {
     doc.open();
     int indices[2] = { 0,0 };   // Begin, end
    
+    // Get all the paragraphs of the document
     for (auto p = doc.paragraphs(); p.has_next(); p.next()) {
-        std::string paragraph, container;
+        std::string paragraph, citationCache;
+
+        // Store the whole paragraph
         for (auto r = p.runs(); r.has_next(); r.next()) {
             paragraph += r.getAll_text();
         }   
         
-        read_paragraph(paragraph, indices, container);
+        read_paragraph(paragraph, indices, citationCache); // Currently the goal is to read the last citation
         
         for (auto r = p.runs(); r.has_next(); r.next()) {
-            if ((r.getAll_text().find(container) != std::string::npos) && (container != "") && (container.find('.') == std::string::npos)) {
+            // Find the citation from the text
+            if ((r.getAll_text().find(citationCache) != std::string::npos) && (citationCache != "") && (citationCache.find('.') == std::string::npos)) {
                 std::cout << "Added a dot to: " << r.getAll_text() << std::endl;
 
-                std::string citationFormat = ("[" + container + ".]");
+                // Edit the file
+                std::string citationFormat = ("[" + citationCache + ".]");
                 r.set_citation(citationFormat.c_str());
             }
         }
