@@ -33,7 +33,7 @@ void read_paragraph(std::string par, int indices[], std::string &container) {
             reverse(container.begin(), container.end());                // Reverse the string, because it was iterated backwards
             //container += '.';                                           // Add the dot
 
-            std::cout << "Check this shit out: " << container << " Index: " << indices[0] << " " << indices[1] << std::endl;
+            std::cout << "Read: " << container << " Index: " << indices[0] << " " << indices[1] << std::endl;
             whileLoop = false;
         }
     }
@@ -44,16 +44,12 @@ void insert_char(std::string &inText, int indices[2]) {
     inText.insert(endPoint, ".");
 }
 
-void edit_document() {
-
-}
-
 int main() {
     // UTF8 text format
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 
-    duckx::Document doc(ASSET_DIR + std::string("/my_test.docx"));
+    duckx::Document doc(ASSET_DIR + std::string("/test_case2.docx"));
     doc.open();
     int indices[2] = { 0,0 };   // Begin, end
    
@@ -61,18 +57,16 @@ int main() {
         std::string paragraph, container;
         for (auto r = p.runs(); r.has_next(); r.next()) {
             paragraph += r.getAll_text();
-            //std::cout << r.getAll_text() << std::endl;
-            //r.set_citation("aaa");
         }   
         
         read_paragraph(paragraph, indices, container);
         
         for (auto r = p.runs(); r.has_next(); r.next()) {
-            if (r.getAll_text().find(container) != std::string::npos && container != "") {
-                std::cout << r.getAll_text() << std::endl;
-                //r.set_citation('[' + container.c_str() + '.' + ']');
-                
-                //std::cout << '[' + container.c_str() + '.' + ']' << std::endl;
+            if ((r.getAll_text().find(container) != std::string::npos) && (container != "") && (container.find('.') == std::string::npos)) {
+                std::cout << "Added a dot to: " << r.getAll_text() << std::endl;
+
+                std::string citationFormat = ("[" + container + ".]");
+                r.set_citation(citationFormat.c_str());
             }
         }
 
@@ -80,8 +74,6 @@ int main() {
         //std::cout << paragraph << std::endl;
     }
 
-    //doc.save();
-
-    //cout << textCache << endl;
+    doc.save();
     return 0;
 }
