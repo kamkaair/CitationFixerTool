@@ -15,8 +15,8 @@ int get_letters(std::string par, std::string &container, int index) {
 // Check if the citation should have a dot or not.
 bool is_citation_eligible(std::string par, int index) {
     if (index <= 0) {
-        std::cout << "Citation eligible: FALSE, STRING END" << std::endl;
-        return false;
+        std::cout << "Citation eligible: TRUE, STRING END" << std::endl;
+        return true;
     }
 
     if (par[index] == ')') { // Skip the sections including ()
@@ -79,7 +79,6 @@ void insert_char(std::string &inText, int indices[2]) {
 }
 
 std::string asset_path = ASSET_DIR + std::string("/test_case2.docx");
-//std::string asset_path = ASSET_DIR + std::string("/Opinnäytetyö-AlttiAir-Testi.docx");
 
 int main() {
     // UTF8 text format
