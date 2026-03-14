@@ -62,9 +62,12 @@ target_link_libraries(duckx
 # ----------------------------
 # Your executable
 # ----------------------------
-file(GLOB SRC_FILES "src/*.cpp")
 
-add_executable(CitationFixer ${SRC_FILES})
+# Files
+file(GLOB SRC_FILES "src/*.cpp")
+file(GLOB_RECURSE HDR_FILES "src/*.h")
+
+add_executable(CitationFixer ${SRC_FILES} ${HDR_FILES})
 
 target_link_libraries(CitationFixer
     duckx
