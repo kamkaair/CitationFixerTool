@@ -24,8 +24,7 @@ bool is_citation_eligible(std::string par, int index) {
         while (par[newIndex] != '(')
             newIndex--;
 
-        int resultIndex = index - newIndex;
-        is_citation_eligible(par, index - resultIndex);
+        return is_citation_eligible(par, newIndex);
     }
 
     if (par[index] == '.') {
@@ -80,6 +79,7 @@ void insert_char(std::string &inText, int indices[2]) {
 }
 
 std::string asset_path = ASSET_DIR + std::string("/test_case2.docx");
+//std::string asset_path = ASSET_DIR + std::string("/Opinnäytetyö-AlttiAir-Testi.docx");
 
 int main() {
     // UTF8 text format
@@ -92,6 +92,7 @@ int main() {
    
     // Get all the paragraphs of the document
     for (auto p = doc.paragraphs(); p.has_next(); p.next()) {
+        std::cout << "/////// -BEGIN- ///////" << std::endl;
         std::string paragraph, citationCache;    
 
         // Store the whole paragraph
@@ -119,6 +120,8 @@ int main() {
                 r.set_citation(citationFormat.c_str());
             }
         }
+        std::cout << paragraph << std::endl;
+        std::cout << "/////// -END- ///////" << std::endl;
         std::cout << std::endl; // Leave empty space after one paragraph
         paragraph += "\n\n";
     }
