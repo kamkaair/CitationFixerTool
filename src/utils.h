@@ -1,10 +1,14 @@
 #pragma once
+#include <vector>
+#include <array>
+
+#include "citation.h"
 
 class utils {
 public:
-	utils::utils(std::string path) : asset_path(path) {
-        doc = duckx::Document(asset_path);
-    };
+	utils::utils(std::string path) : m_asset_path(path) {
+        doc = duckx::Document(m_asset_path);
+    };   
 
     // Get the characters inside a citation
     int get_letters(std::string par, std::string& container, int index) {
@@ -63,10 +67,18 @@ public:
 
                 citationEligible = is_citation_eligible(par, indices[1]);
 
+                createNewCitation(container, indices);
+
                 std::cout << "Read: " << container << " Index: " << indices[0] << " " << indices[1] << std::endl;
                 whileLoop = false;
             }
         }
+    }
+
+    void createNewCitation(std::string name, int indices[2]) {
+        citation newCitation(name, indices, m_citationIndex);
+        m_citations.push_back(newCitation);
+        m_citationIndex++;
     }
 
     void getCitationAmount(std::string par, int& citationAmount) {
@@ -86,6 +98,9 @@ public:
     }
 
 private:
-    std::string asset_path;
+    std::string m_asset_path;
     duckx::Document doc;
+
+    std::vector<citation> m_citations;
+    int m_citationIndex = 0;
 };
