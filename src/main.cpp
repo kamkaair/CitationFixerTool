@@ -50,6 +50,7 @@ int main() {
         std::cout << "/////// -END- ///////" << std::endl;
         std::cout << std::endl; // Leave empty space after one paragraph
         paragraph += "\n\n";
+        
     }
 
     ut.getDoc().save();

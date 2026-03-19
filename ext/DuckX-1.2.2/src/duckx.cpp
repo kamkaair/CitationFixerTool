@@ -42,24 +42,40 @@ std::string duckx::Run::get_text() const {
 	return this->current.child("w:t").text().get();
 }
 
+// Word trims spaces unless preserved, include or add a space if that is empty
+std::string get_text_with_space(pugi::xml_node t) {
+	std::string text = t.text().get();
+
+	auto space_attr = t.attribute("xml:space");
+	bool preserve = space_attr && std::string(space_attr.value()) == "preserve";
+
+	if (preserve && text.empty()) {
+		return " ";
+	}
+
+	return text;
+}
+
 std::string duckx::Run::getAll_text() const {
 	std::string result;
 
 	for (auto t = this->current.child("w:t"); t; t = t.next_sibling("w:t")) {
 		result += t.text().get();
+		//result += get_text_with_space(t);
 	}
 
-	// Text inside <w:sdtContent> (Mendeley citations)
+	// Text inside <w:sdtContent> of Mendeley citations
 	auto sdtContent = this->current.child("w:sdtContent");
 	if (sdtContent) {
 		for (auto r = sdtContent.child("w:r"); r; r = r.next_sibling("w:r")) {
 			for (auto t = r.child("w:t"); t; t = t.next_sibling("w:t")) {
 				result += t.text().get();
+				//result += get_text_with_space(t);
 			}
 		}
 	}
 
-	// Field instruction text (Mendeley)
+	// Field instruction text for Mendeley, might be redundant
 	for (auto instr = this->current.child("w:instrText"); instr; instr = instr.next_sibling("w:instrText")) {
 		result += instr.text().get();
 	}

@@ -8,7 +8,7 @@ class utils {
 public:
 	utils::utils(std::string path) : m_asset_path(path) {
         doc = duckx::Document(m_asset_path);
-    };   
+    };
 
     // Get the characters inside a citation
     int get_letters(std::string par, std::string& container, int index) {
@@ -46,7 +46,7 @@ public:
             return true;
         }
 
-        return is_citation_eligible(par, index - 1);
+        return is_citation_eligible(par, index - 3); // Skip a possible dot next to the processed citation
     }
 
     void read_paragraph(std::string par, int indices[], std::string& container, bool& citationEligible) {
