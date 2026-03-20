@@ -42,26 +42,11 @@ std::string duckx::Run::get_text() const {
 	return this->current.child("w:t").text().get();
 }
 
-// Word trims spaces unless preserved, include or add a space if that is empty
-std::string get_text_with_space(pugi::xml_node t) {
-	std::string text = t.text().get();
-
-	auto space_attr = t.attribute("xml:space");
-	bool preserve = space_attr && std::string(space_attr.value()) == "preserve";
-
-	if (preserve && text.empty()) {
-		return " ";
-	}
-
-	return text;
-}
-
 std::string duckx::Run::getAll_text() const {
 	std::string result;
 
 	for (auto t = this->current.child("w:t"); t; t = t.next_sibling("w:t")) {
 		result += t.text().get();
-		//result += get_text_with_space(t);
 	}
 
 	// Text inside <w:sdtContent> of Mendeley citations
@@ -70,12 +55,11 @@ std::string duckx::Run::getAll_text() const {
 		for (auto r = sdtContent.child("w:r"); r; r = r.next_sibling("w:r")) {
 			for (auto t = r.child("w:t"); t; t = t.next_sibling("w:t")) {
 				result += t.text().get();
-				//result += get_text_with_space(t);
 			}
 		}
 	}
 
-	// Field instruction text for Mendeley, might be redundant
+	// Field instruction text for Mendeley
 	for (auto instr = this->current.child("w:instrText"); instr; instr = instr.next_sibling("w:instrText")) {
 		result += instr.text().get();
 	}
@@ -91,22 +75,22 @@ bool duckx::Run::set_text(const char* text) const {
 	return this->current.child("w:t").text().set(text);
 }
 
-bool duckx::Run::set_citation(const char* text) const {
-	const char* result = "";
+std::string duckx::Run::set_citation(std::string text) const {
+	std::string result = "";
 
 	// Text inside <w:sdtContent> (Mendeley citations)
 	auto sdtContent = this->current.child("w:sdtContent");
 	if (sdtContent) {
 		for (auto r = sdtContent.child("w:r"); r; r = r.next_sibling("w:r")) {
 			for (auto t = r.child("w:t"); t; t = t.next_sibling("w:t")) {
-				result += t.text().set(text);
+				result += t.text().set(text.c_str());
 			}
 		}
 	}
 
 	// Field instruction text (Mendeley)
 	for (auto instr = this->current.child("w:instrText"); instr; instr = instr.next_sibling("w:instrText")) {
-		result += instr.text().set(text);
+		result += instr.text().set(text.c_str());
 	}
 
 	return result;

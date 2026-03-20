@@ -2,6 +2,7 @@
 #include <duckx.hpp>
 #include <windows.h>
 #include <string>
+#include <vector>
 
 #include "utils.h"
 
@@ -19,7 +20,6 @@ int main() {
     for (auto p = ut.getDoc().paragraphs(); p.has_next(); p.next()) {
         std::cout << "/////// -BEGIN- ///////" << std::endl;
         std::string paragraph, citationCache;
-        int indices[2] = { 0,0 };   // Begin, end
 
         // Store the whole paragraph
         for (auto r = p.runs(); r.has_next(); r.next()) {
@@ -27,11 +27,11 @@ int main() {
         }   
         
         bool citationEligible = false;
-        ut.read_paragraph(paragraph, indices, citationCache, citationEligible); // Currently the goal is to read the last citation
+        ut.read_paragraph(paragraph, citationCache, citationEligible); // Currently the goal is to read the last citation
 
-        int citationAmount = 0;
-        ut.getCitationAmount(paragraph, citationAmount);
-        std::cout << "Citation amount: " << citationAmount << std::endl;
+        //int citationAmount = 0;
+        //ut.getCitationAmount(paragraph, citationAmount);
+        //std::cout << "Citation amount: " << citationAmount << std::endl;
         
         for (auto r = p.runs(); r.has_next(); r.next()) {
             bool findText = (r.getAll_text().find(citationCache) != std::string::npos);
@@ -46,11 +46,20 @@ int main() {
                 r.set_citation(citationFormat.c_str());
             }
         }
+
+        std::vector<int*> indices;
+        int i = 0;
+        ut.createAllCitations(paragraph, indices, i);
+
         std::cout << paragraph << std::endl;
         std::cout << "/////// -END- ///////" << std::endl;
         std::cout << std::endl; // Leave empty space after one paragraph
         paragraph += "\n\n";
         
+    }
+
+    for (auto c : ut.getCitations()) {
+        std::cout << "Begin I: " << c.getIndexBegin() << " - End I: " << c.getIndexEnd() << " - Content: " << c.getName() << std::endl;
     }
 
     ut.getDoc().save();

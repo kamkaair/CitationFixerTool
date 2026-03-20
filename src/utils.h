@@ -11,16 +11,17 @@ public:
     };
 
     // Get the characters inside a citation
-    int get_letters(std::string par, std::string& container, int index) {
-        if (par[index] == '[')
+    int get_letters(const std::string par, std::string& container, const char endChar, int index, bool reverse = false) {
+        if (par[index] == endChar)
             return index;
 
         container += par[index];
-        return get_letters(par, container, index - 1);
+        return reverse ? get_letters(par, container, endChar, index - 1, true) : get_letters(par, container, endChar, index + 1, false);
+        //return get_letters(par, container, endChar, index + minPlus, minPlus);
     }
 
     // Check if the citation should have a dot or not.
-    bool is_citation_eligible(std::string par, int index) {
+    bool is_citation_eligible(const std::string par, int index) {
         if (index <= 0) {
             std::cout << "Citation eligible: TRUE, STRING END" << std::endl;
             return true;
@@ -49,9 +50,10 @@ public:
         return is_citation_eligible(par, index - 3); // Skip a possible dot next to the processed citation
     }
 
-    void read_paragraph(std::string par, int indices[], std::string& container, bool& citationEligible) {
+    void read_paragraph(std::string par, std::string& container, bool& citationEligible) {
 
         bool whileLoop = true;
+        int indices[2] = {0,0};
 
         if (par.find(']') == std::string::npos)
             return;
@@ -62,14 +64,12 @@ public:
                     indices[j] = i;
                 }
 
-                indices[1] = get_letters(par, container, indices[1] - 1);     // Go through all the letters from ']' onwards
-                reverse(container.begin(), container.end());                // Reverse the string, because it was iterated backwards
+                indices[1] = get_letters(par, container, '[', indices[1]-1, true); // Go through all the letters from ']' onwards. Added true, because we want to go backwards
+                reverse(container.begin(), container.end());                          // Reverse the string, because it was iterated backwards
 
-                citationEligible = is_citation_eligible(par, indices[1]);
+                citationEligible = is_citation_eligible(par, indices[1]);             // Check if citation is eligible to have a dot added to them
 
-                createNewCitation(container, indices);
-
-                std::cout << "Read: " << container << " Index: " << indices[0] << " " << indices[1] << std::endl;
+                //std::cout << "Read: " << container << " Index: " << indices[0] << " " << indices[1] << std::endl;
                 whileLoop = false;
             }
         }
@@ -83,9 +83,58 @@ public:
 
     void getCitationAmount(std::string par, int& citationAmount) {
         for (auto c : par) {
-            if (c == '[')
+            if (c == '[') {
                 citationAmount++;
+            }
         }
+    }
+
+    int skipCondition(std::string par, int currIndex, char beginChar, char endChar) {
+        if (par[currIndex] != beginChar) {
+            std::cout << "ERROR: couldn't skip condition " << beginChar << " because the input paragraph char and begin char didn't match!" << std::endl;
+            return -1;
+        }
+
+        int newIndex = currIndex;
+        while (par[newIndex] != endChar) {
+            newIndex++;
+        }
+        return newIndex;
+    }
+
+    void createAllCitations(const std::string par, std::vector<int*> indices, int currIndex) {
+        /*for (int i = 0; i < par.size(); i++) {
+            if (par[i] == '[') {
+                int indicesTemp[2] = {i,0}; // begin and end
+                std::cout << "Begin: " << i << std::endl;
+
+                while (!par[i] != ']') 
+                    i++;
+
+                indicesTemp[2] = i;
+                indices.push_back(indicesTemp);
+                std::cout << "End: " << i << std::endl;
+            }
+        }*/
+
+        if (par.size() < currIndex)
+            return;
+
+        if (par[currIndex] == '[') {
+            int indicesTemp[2] = {currIndex,0}; // begin and end
+            std::string citationContent;
+
+            //int newIndex = skipCondition(par, currIndex, '[', ']');
+            int newIndex = get_letters(par, citationContent, ']', currIndex+1); // Add +1 to the index to ignore the initial bracket
+
+            indicesTemp[1] = newIndex;
+
+            createNewCitation(citationContent, indicesTemp);
+
+            std::cout << "Added index[0]: " << indicesTemp[0] << " index[1]: " << indicesTemp[1] << std::endl;
+        }
+        
+        createAllCitations(par, indices, currIndex+1);
     }
 
     void insert_char(std::string& inText, int indices[2]) {
@@ -95,6 +144,10 @@ public:
 
     duckx::Document& getDoc() {
         return doc;
+    }
+
+    std::vector<citation> getCitations() {
+        return m_citations;
     }
 
 private:
