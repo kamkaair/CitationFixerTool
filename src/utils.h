@@ -12,9 +12,9 @@ public:
 
     // Get the characters inside a citation
     int get_letters(const std::string par, std::string& container, const char endChar, int index, int direction = +1) {
-        if (par[index] == endChar)
+        if (par[index] == endChar) 
             return index;
-
+            
         container += par[index];
         return get_letters(par, container, endChar, index + direction, direction);
     }
@@ -50,7 +50,6 @@ public:
     }
 
     void read_paragraph(std::string par, std::string& container, bool& citationEligible) {
-
         bool whileLoop = true;
         int indices[2] = {0,0};
 
@@ -74,10 +73,12 @@ public:
         }
     }
 
-    void createNewCitation(std::string name, int indices[2]) {
+    citation createNewCitation(std::string name, int indices[2]) {
         citation newCitation(name, indices, m_citationIndex);
         m_citations.push_back(newCitation);
         m_citationIndex++;
+
+        return newCitation;
     }
 
     void getCitationAmount(std::string par, int& citationAmount) {
@@ -88,7 +89,7 @@ public:
         }
     }
 
-    void createAllCitations(const std::string par, std::vector<int*> indices, int currIndex = 0) {
+    void createAllCitations(const std::string par, std::vector<citation>& citationCache, int currIndex = 0) {
         if (par.size() < currIndex)
             return;
 
@@ -99,21 +100,23 @@ public:
             int newIndex = get_letters(par, citationContent, ']', currIndex+1); // Add +1 to the index to ignore the initial bracket
             indicesTemp[1] = newIndex;
 
-            createNewCitation(citationContent, indicesTemp);
-            std::cout << "Added index[0]: " << indicesTemp[0] << " index[1]: " << indicesTemp[1] << std::endl;
+            citationCache.push_back(createNewCitation(citationContent, indicesTemp)); // push_back to the temporary citation cache
+
+            //std::cout << "Added index[0]: " << indicesTemp[0] << " - " << citationCache[citationCache.size()-1].getIndexEnd() << " index[1]: " << indicesTemp[1] << " - " << citationCache[citationCache.size() - 1].getIndexBegin() << std::endl;
         }
         
-        createAllCitations(par, indices, currIndex+1);
+        createAllCitations(par, citationCache, currIndex+1);
     }
 
-    void addSpaces(std::string& par) {
-        for (auto c : m_citations) {        
+    void addSpaces(std::string& par, const std::vector<citation> indices) {
+        for (auto c : indices) {
             if (par[c.getIndexBegin() - 1] != ' ') {
-                par.insert(c.getIndexBegin()-1, " ");
+                par.insert(c.getIndexBegin(), " ");
+                std::cout << "Space-- added to: " << par[c.getIndexBegin()] << " INDEX: " << c.getIndexBegin() << std::endl;
             }
 
-            int foundSpace = 0;
             for (int i = 1; i < 2; i++) {
+                std::cout << "Current character: " << par[c.getIndexEnd()] << std::endl;
                 if (par.size() < (c.getIndexEnd() + i))
                     break;
 
@@ -122,10 +125,10 @@ public:
                 }    
                 else if (par[c.getIndexEnd() + i] != ' ') {
                     par.insert(c.getIndexEnd() + i, " ");
+                    std::cout << "Space++ added to: " << par[c.getIndexEnd()] << " INDEX: " << c.getIndexEnd() << std::endl;
                 }
-
-                std::cout << "Jaa" << i << std::endl;
             } 
+            std::cout << "Looped through: " << c.getName() << std::endl;
         }
     }
 
