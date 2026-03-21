@@ -11,13 +11,12 @@ public:
     };
 
     // Get the characters inside a citation
-    int get_letters(const std::string par, std::string& container, const char endChar, int index, bool reverse = false) {
+    int get_letters(const std::string par, std::string& container, const char endChar, int index, int direction = +1) {
         if (par[index] == endChar)
             return index;
 
         container += par[index];
-        return reverse ? get_letters(par, container, endChar, index - 1, true) : get_letters(par, container, endChar, index + 1, false);
-        //return get_letters(par, container, endChar, index + minPlus, minPlus);
+        return get_letters(par, container, endChar, index + direction, direction);
     }
 
     // Check if the citation should have a dot or not.
@@ -64,7 +63,7 @@ public:
                     indices[j] = i;
                 }
 
-                indices[1] = get_letters(par, container, '[', indices[1]-1, true); // Go through all the letters from ']' onwards. Added true, because we want to go backwards
+                indices[1] = get_letters(par, container, '[', indices[1]-1, -1); // Go through all the letters from ']' onwards. Added true, because we want to go backwards
                 reverse(container.begin(), container.end());                          // Reverse the string, because it was iterated backwards
 
                 citationEligible = is_citation_eligible(par, indices[1]);             // Check if citation is eligible to have a dot added to them
@@ -89,34 +88,7 @@ public:
         }
     }
 
-    int skipCondition(std::string par, int currIndex, char beginChar, char endChar) {
-        if (par[currIndex] != beginChar) {
-            std::cout << "ERROR: couldn't skip condition " << beginChar << " because the input paragraph char and begin char didn't match!" << std::endl;
-            return -1;
-        }
-
-        int newIndex = currIndex;
-        while (par[newIndex] != endChar) {
-            newIndex++;
-        }
-        return newIndex;
-    }
-
-    void createAllCitations(const std::string par, std::vector<int*> indices, int currIndex) {
-        /*for (int i = 0; i < par.size(); i++) {
-            if (par[i] == '[') {
-                int indicesTemp[2] = {i,0}; // begin and end
-                std::cout << "Begin: " << i << std::endl;
-
-                while (!par[i] != ']') 
-                    i++;
-
-                indicesTemp[2] = i;
-                indices.push_back(indicesTemp);
-                std::cout << "End: " << i << std::endl;
-            }
-        }*/
-
+    void createAllCitations(const std::string par, std::vector<int*> indices, int currIndex = 0) {
         if (par.size() < currIndex)
             return;
 
@@ -124,17 +96,37 @@ public:
             int indicesTemp[2] = {currIndex,0}; // begin and end
             std::string citationContent;
 
-            //int newIndex = skipCondition(par, currIndex, '[', ']');
             int newIndex = get_letters(par, citationContent, ']', currIndex+1); // Add +1 to the index to ignore the initial bracket
-
             indicesTemp[1] = newIndex;
 
             createNewCitation(citationContent, indicesTemp);
-
             std::cout << "Added index[0]: " << indicesTemp[0] << " index[1]: " << indicesTemp[1] << std::endl;
         }
         
         createAllCitations(par, indices, currIndex+1);
+    }
+
+    void addSpaces(std::string& par) {
+        for (auto c : m_citations) {        
+            if (par[c.getIndexBegin() - 1] != ' ') {
+                par.insert(c.getIndexBegin()-1, " ");
+            }
+
+            int foundSpace = 0;
+            for (int i = 1; i < 2; i++) {
+                if (par.size() < (c.getIndexEnd() + i))
+                    break;
+
+                else if (par[c.getIndexEnd() + i] == '.') {
+                    continue;
+                }    
+                else if (par[c.getIndexEnd() + i] != ' ') {
+                    par.insert(c.getIndexEnd() + i, " ");
+                }
+
+                std::cout << "Jaa" << i << std::endl;
+            } 
+        }
     }
 
     void insert_char(std::string& inText, int indices[2]) {

@@ -28,10 +28,6 @@ int main() {
         
         bool citationEligible = false;
         ut.read_paragraph(paragraph, citationCache, citationEligible); // Currently the goal is to read the last citation
-
-        //int citationAmount = 0;
-        //ut.getCitationAmount(paragraph, citationAmount);
-        //std::cout << "Citation amount: " << citationAmount << std::endl;
         
         for (auto r = p.runs(); r.has_next(); r.next()) {
             bool findText = (r.getAll_text().find(citationCache) != std::string::npos);
@@ -48,8 +44,9 @@ int main() {
         }
 
         std::vector<int*> indices;
-        int i = 0;
-        ut.createAllCitations(paragraph, indices, i);
+        ut.createAllCitations(paragraph, indices);
+
+        //ut.addSpaces(paragraph);
 
         std::cout << paragraph << std::endl;
         std::cout << "/////// -END- ///////" << std::endl;
