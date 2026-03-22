@@ -26,11 +26,11 @@ int main() {
         // Store the whole paragraph
         for (auto r = p.runs(); r.has_next(); r.next()) {
             paragraph += r.getAll_text();
-        }   
-        
+        }
+
         std::vector<citation> tempCitations; // temporary citation cache used for adding the spaces for the recent citations
         ut.createAllCitations(paragraph, tempCitations);
-        ut.addSpaces(paragraph, tempCitations);
+        ut.addSpaces(paragraph);
 
         bool citationEligible = false;
         ut.read_paragraph(paragraph, citationCache, citationEligible); // Currently the goal is to read the last citation
@@ -46,20 +46,8 @@ int main() {
                 // Edit the file
                 std::string citationFormat = ("[" + citationCache + ".]");
                 r.set_citation(citationFormat.c_str());
-            }
+            }  
         }
-
-        //p.runs().set_text(paragraph);
-
-        //for (auto r = p.runs(); r.has_next(); r.next()) {
-            //r.set_citation()
-        //}
-        //ut.addSpaces(paragraph);
-
-        /*for (auto c : ut.getCitations()) {
-            c.printIndices();
-            std::cout << c.getIndexBegin() << " " << c.getIndexEnd() << std::endl;
-        }*/
 
         std::cout << paragraph << std::endl;
         std::cout << "/////// -END- ///////" << std::endl;

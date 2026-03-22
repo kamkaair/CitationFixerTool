@@ -12,8 +12,8 @@ public:
 
     // Get the characters inside a citation
     int get_letters(const std::string par, std::string& container, const char endChar, int index, int direction = +1) {
-        if (par[index] == endChar) 
-            return index;
+        if (par[index] == endChar)
+            return index; 
             
         container += par[index];
         return get_letters(par, container, endChar, index + direction, direction);
@@ -100,35 +100,43 @@ public:
             int newIndex = get_letters(par, citationContent, ']', currIndex+1); // Add +1 to the index to ignore the initial bracket
             indicesTemp[1] = newIndex;
 
-            citationCache.push_back(createNewCitation(citationContent, indicesTemp)); // push_back to the temporary citation cache
+            currIndex = newIndex;
 
-            //std::cout << "Added index[0]: " << indicesTemp[0] << " - " << citationCache[citationCache.size()-1].getIndexEnd() << " index[1]: " << indicesTemp[1] << " - " << citationCache[citationCache.size() - 1].getIndexBegin() << std::endl;
+            citation tempCit = createNewCitation(citationContent, indicesTemp);
+            citationCache.push_back(tempCit); // push_back to the temporary citation cache
+
+            std::cout << "Added index[0]: " << indicesTemp[0] << " - " << tempCit.getIndexBegin() << " index[1]: " << indicesTemp[1] << " - " << tempCit.getIndexEnd() << std::endl;
         }
         
-        createAllCitations(par, citationCache, currIndex+1);
+        return createAllCitations(par, citationCache, currIndex+1);
     }
 
-    void addSpaces(std::string& par, const std::vector<citation> indices) {
-        for (auto c : indices) {
-            if (par[c.getIndexBegin() - 1] != ' ') {
-                par.insert(c.getIndexBegin(), " ");
-                std::cout << "Space-- added to: " << par[c.getIndexBegin()] << " INDEX: " << c.getIndexBegin() << std::endl;
+    int processSpaces(std::string& par, int currIndex) {
+        if (par[currIndex - 1] != ' ')
+            par.insert(currIndex, " ");
+
+        int newIndex = currIndex;
+        while (par[newIndex] != ']')
+            newIndex++;
+
+        for (int i = 1; i < 3; i++) {
+
+            if (par[newIndex + i] == '.')
+                continue;
+
+            else if (par[newIndex + i] != ' ') {
+                par.insert(newIndex+i, " ");
+                return newIndex + i;
             }
+        }
+        return newIndex;
+    }
 
-            for (int i = 1; i < 2; i++) {
-                std::cout << "Current character: " << par[c.getIndexEnd()] << std::endl;
-                if (par.size() < (c.getIndexEnd() + i))
-                    break;
-
-                else if (par[c.getIndexEnd() + i] == '.') {
-                    continue;
-                }    
-                else if (par[c.getIndexEnd() + i] != ' ') {
-                    par.insert(c.getIndexEnd() + i, " ");
-                    std::cout << "Space++ added to: " << par[c.getIndexEnd()] << " INDEX: " << c.getIndexEnd() << std::endl;
-                }
-            } 
-            std::cout << "Looped through: " << c.getName() << std::endl;
+    void addSpaces(std::string& par) {
+        for (int i = 0; i < par.length(); i++) {
+            if (par[i] == '[') {
+                i = processSpaces(par, i);
+            }
         }
     }
 

@@ -21,14 +21,14 @@ public:
         return m_indices[1];
     }
 
-    void printIndices() {
-        for (auto i : m_indices) {
-            std::cout << "Indices: " << i << std::endl;
-        }
-    }
-
     int getIndex() const {
         return m_ID;
+    }
+
+    void setIndices(int indices[2]) {
+        for (int i = 0; i < 2; i++) {
+            m_indices[i] = indices[i];
+        }
     }
 
 private:
